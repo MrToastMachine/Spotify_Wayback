@@ -1,7 +1,13 @@
-import tkCalendar
 import pandas as pd
 
-dates = tkCalendar.launch_date_picker()
+# Replace 'your_file.xlsx' with the actual path to your Excel file
+file_path = 'single_duplicates_only.xlsx'
 
-print("Start Date: " + dates[0])
-print("End Date: " + dates[1])
+# Read the Excel file
+df = pd.read_excel(file_path)
+
+# Extract the "uri" column as a Python array
+uri_array = df['spotify_track_uri'].tolist()
+
+# Print or use the uri_array as needed
+print(uri_array)
