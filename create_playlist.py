@@ -3,6 +3,10 @@ from spotipy.oauth2 import SpotifyOAuth
 from datetime import datetime
 import pandas as pd
 
+CLIENT_ID = "1f9f93179a6243cd8e6e7c18881c5afb"
+CLIENT_SECRET = "6e9fc1642c714dfc9a962349706a18b8"
+REDIRECT_URI = "https://localhost/callback"
+
 # INPUT FILE
 file_path = 'single_duplicates_only.xlsx'
 df = pd.read_excel(file_path)
@@ -18,7 +22,10 @@ print(f"Current Date: {formatted_date}")
 
 scope = "playlist-modify-public"
 
-sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope, client_id="1f9f93179a6243cd8e6e7c18881c5afb", client_secret="6e9fc1642c714dfc9a962349706a18b8", redirect_uri="https://127.0.0.1/callback" ))
+credentials_manager = SpotifyOAuth(scope=scope, client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URI, open_browser=False)
+
+# sp = spotipy.Spotify(auth_manager=credentials_manager)
+sp = spotipy.Spotify(client_credentials_manager=credentials_manager)
 
 
 # Create a new playlist

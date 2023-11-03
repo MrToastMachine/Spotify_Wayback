@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 import tkCalendar
+import pandas as pd
 
 def filter_data_by_date_range(data, start_date, end_date):
     filtered_data = []
@@ -33,7 +34,11 @@ if __name__ == "__main__":
     with open(input_file, "r", encoding="utf8") as file:
         json_data = json.load(file)
 
+    # filtered_data is of type 'list'
     filtered_data = filter_data_by_date_range(json_data, start_date, end_date)
+    pd_filtered_data = pd.DataFrame(filtered_data)
+
+    print(pd_filtered_data)
 
     output_file = "filtered_output.json"
     with open(output_file, "w") as file:
