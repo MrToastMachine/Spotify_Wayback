@@ -2,6 +2,8 @@ import json
 from datetime import datetime
 import tkCalendar
 import pandas as pd
+from pandas_json import remove_single_occurrences
+from create_playlist import *
 
 def filter_data_by_date_range(data, start_date, end_date):
     filtered_data = []
@@ -45,3 +47,13 @@ if __name__ == "__main__":
         json.dump(filtered_data, file, indent=4)
 
     print(f"Filtered data saved to '{output_file}'.")
+
+    print("Removing songs that were only played once...")
+
+    final_playlist = remove_single_occurrences(pd_filtered_data)
+
+    print("Successfully trimmed...")
+
+    create_new_playlist(final_playlist, f"{dates[0]} - {dates[1]}")
+
+
