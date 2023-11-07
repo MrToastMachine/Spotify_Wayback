@@ -1,3 +1,3 @@
-print("This is the file for testing")
+import os
 
-print("EEEEEE")
+os.mkdir("ASS")

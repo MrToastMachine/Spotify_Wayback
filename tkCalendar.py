@@ -48,3 +48,4 @@ def launch_date_picker():
 
 if __name__ == "__main__":
     dates = launch_date_picker()
+    print(dates)
