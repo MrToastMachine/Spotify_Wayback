@@ -1,3 +1,9 @@
 import os
+from dotenv import load_dotenv
 
-os.mkdir("ASS")
+load_dotenv()
+
+CLIENT_ID = os.getenv("CLIENT_ID")
+
+
+print(CLIENT_ID)

@@ -1,11 +1,15 @@
+import os
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from datetime import datetime
 import pandas as pd
+from dotenv import load_dotenv
 
-CLIENT_ID = "1f9f93179a6243cd8e6e7c18881c5afb"
-CLIENT_SECRET = "6e9fc1642c714dfc9a962349706a18b8"
-REDIRECT_URI = "https://localhost/callback"
+load_dotenv()
+
+CLIENT_ID = os.getenv("CLIENT_ID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+REDIRECT_URI = os.getenv("REDIRECT_URI")
 
 # Get current date
 current_date = datetime.now()
