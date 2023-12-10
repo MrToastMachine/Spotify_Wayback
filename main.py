@@ -40,7 +40,7 @@ if __name__ == "__main__":
     filtered_data = filter_data_by_date_range(json_data, start_date, end_date)
     pd_filtered_data = pd.DataFrame(filtered_data)
 
-    print(pd_filtered_data)
+    # print(pd_filtered_data)
 
     output_file = "filtered_output.json"
     with open(output_file, "w") as file:
