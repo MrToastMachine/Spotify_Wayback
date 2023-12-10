@@ -1,3 +1,9 @@
-print("This is the file for testing")
+import os
+from dotenv import load_dotenv
 
-print("EEEEEE")
+load_dotenv()
+
+CLIENT_ID = os.getenv("CLIENT_ID")
+
+
+print(CLIENT_ID)

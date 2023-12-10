@@ -1,13 +1,15 @@
+import os
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from datetime import datetime
 import pandas as pd
+from dotenv import load_dotenv
 
-CLIENT_ID = "1f9f93179a6243cd8e6e7c18881c5afb"
-CLIENT_SECRET = "6e9fc1642c714dfc9a962349706a18b8"
-REDIRECT_URI = "https://localhost/callback"
+load_dotenv()
 
-
+CLIENT_ID = os.getenv("CLIENT_ID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+REDIRECT_URI = os.getenv("REDIRECT_URI")
 
 # Get current date
 current_date = datetime.now()
@@ -30,11 +32,7 @@ def create_new_playlist(song_list, playlist_name=None, playlist_desc=None):
 
     # Instead of this:
     #   while nextSong in list exists, add it until no more songs
-    print(type(song_list))
-    print(len(song_list))
-    if len(song_list) >= 100:
-        print("TOO MANY SONGS!!!!")
-        # song_list = song_list[:99]
+    print(f"Num songs to add: {len(song_list)}")
 
     if playlist_name == None:
         playlist_name = "Wayback_" + formatted_date
@@ -48,10 +46,15 @@ def create_new_playlist(song_list, playlist_name=None, playlist_desc=None):
 
     # sp.playlist_add_items(new_playlist['id'], song_uri_list)
     # print("Added tracks to the playlist.")
-
+    print("Adding songs...")
     for i in range(len(song_uri_list)):
         # print(song_uri_list[i])
-        sp.playlist_add_items(new_playlist['id'], [song_uri_list[i]])
+        try:
+            sp.playlist_add_items(new_playlist['id'], [song_uri_list[i]])
+        except:
+            print(f"Error adding track {song_uri_list[i]}")
+
+    print("Complete!")
 
 run = False
 if run:

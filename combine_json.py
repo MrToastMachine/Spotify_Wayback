@@ -20,6 +20,8 @@ def combine_json_files(directory_path, output_file):
     with open(output_file, 'w') as outfile:
         json.dump(combined_data, outfile, indent=4)
 
+    return combined_data
+
 if __name__ == "__main__":
     input_directory = "."  # Change this to the directory containing your JSON files
     output_file = "Full_Streaming_History.json"         # Change this to the desired output filename
