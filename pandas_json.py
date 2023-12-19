@@ -49,7 +49,7 @@ def remove_single_occurrences(filtered_songs):
     print("here bud")
     # tk_setup()
 
-    get_top_played(filtered_songs, 5)
+    # get_top_played(filtered_songs, 5)
 
     duplicates_mask = filtered_songs.duplicated(keep=False, subset=['spotify_track_uri'])
     # Convert boolean list to excel
