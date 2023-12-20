@@ -1,3 +1,5 @@
+# USE python 3.11.5
+
 import os
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth

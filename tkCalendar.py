@@ -26,11 +26,12 @@ def on_date_select():
     # result_label.config(text=f"Start Date (UK format): {start_date_uk}\nEnd Date (UK format): {end_date_uk}")
 
     try:
-        num_song_plays = num_entry.get()
+        num_song_plays = int(num_entry.get())
+        app.quit()
+
     except:
         print("Num entries inputted is not a number")
 
-    app.quit()
     
 
 #APP STRUCTURE SETUP

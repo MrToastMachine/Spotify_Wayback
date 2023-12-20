@@ -5,7 +5,7 @@ from datetime import datetime
 import pandas as pd
 
 import tkCalendar
-from pandas_json import remove_single_occurrences
+from pandas_json import *
 from create_playlist import *
 from tk_load_file import *
 
@@ -54,10 +54,14 @@ if __name__ == "__main__":
 
     # Launch tkinter window to get playlist info
     playlist_specs = tkCalendar.get_playlist_info()
+    print(f"playlist_specs : {playlist_specs}")
 
     # excessive but makes it clearer
-    dates = playlist_specs[:1]
-    num_song_plays = playlist_specs[2]
+    dates = [x for x in playlist_specs[:2]]
+    num_song_plays = playlist_specs[2] if playlist_specs[2] else 2
+    print(f"dates : {dates}")
+    print(f"num_song_plays : {num_song_plays}")
+
 
     # Format dates to usable format
     start_date_str = dates[0] + " 00:00:01"
@@ -80,9 +84,10 @@ if __name__ == "__main__":
     print(f"Filtered data saved to '{output_file}'.")
 
     # remove duplicate songs
-    print("Removing songs that were only played once...")
-    final_playlist = remove_single_occurrences(pd_filtered_data)
+    final_playlist = get_filtered_song_list(pd_filtered_data, min_plays=num_song_plays)
     print("Successfully trimmed...")
+
+    final_playlist.to_excel("final_list.xlsx")
 
     create_new_playlist(final_playlist, playlist_title)
 

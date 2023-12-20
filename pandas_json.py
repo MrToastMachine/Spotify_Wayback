@@ -1,3 +1,4 @@
+import json
 import tkinter as tk
 from tkinter import messagebox
 import pandas as pd
@@ -36,67 +37,82 @@ def tk_setup():
 
     window.mainloop()
 
-def get_top_played(song_list, num_plays):
-    sorted_songs = sorted(song_list, key=song_list.count)
-    song_data  = [(song_list["master_metadata_track_name"][x], song_list["spotify_track_uri"][x]) for x in range(len(song_list))]
-    sorted_songs = sorted_songs.reverse()
-
-    no_dupes = sorted_songs.drop_duplicates(subset=['spotify_track_uri'])
-    for song in no_dupes:
-        print(song.count, song[0])
-
-def remove_single_occurrences(filtered_songs):
-    print("here bud")
-    # tk_setup()
-
-    # get_top_played(filtered_songs, 5)
-
-    duplicates_mask = filtered_songs.duplicated(keep=False, subset=['spotify_track_uri'])
+def remove_duplicates(input_df):
+    # Create list of bools representing duplicate songs
+    # True for all entries with duplicates
+    duplicates_mask = input_df.duplicated(keep="first", subset=['spotify_track_uri'])
     # Convert boolean list to excel
     # duplicates_mask.to_excel('duplicates_mask.xlsx')
 
-    all_duplicates = filtered_songs[duplicates_mask]
+    # Trim list of duplicate entries
+    all_duplicates_removed = input_df[duplicates_mask==False]
     # all_duplicates.to_excel('all_duplicates.xlsx')
 
-    single_duplicates_only = all_duplicates.drop_duplicates(subset=['spotify_track_uri'])
+    return all_duplicates_removed
 
-    # single_duplicates_only.to_excel('single_duplicates_only.xlsx')
-
-    gooas
-    return single_duplicates_only
-
-
-if __name__=="__main__":
-    filtered_data = pd.read_json('filtered_output.json')
-    print("Num songs total: " + str(len(filtered_data)))
-
-    id_counts = filtered_data['spotify_track_uri'].value_counts()
+def get_songs_by_min_plays(song_list, min_plays):
+    id_counts = song_list['spotify_track_uri'].value_counts()
 
     # Create a new DataFrame ordered by id counts
     sorted_df = pd.DataFrame({'spotify_track_uri': id_counts.index, 'count': id_counts.values})
 
-
     # Merge with the original DataFrame to include the corresponding names
-    result_df = pd.merge(sorted_df, filtered_data, on='spotify_track_uri')
+    result_df = pd.merge(sorted_df, song_list, on='spotify_track_uri')
 
     for i in range(15):
         
         # This line is great - I love this line
         # creates a dataframe of all songs with count > i
-        filtered_df = result_df[result_df['count'] > i]
+        filtered_df = result_df[result_df['count'] >= i]
 
-        print(f"Num songs with {i:2} plays: {len(filtered_df)}")
+        print(f"Num songs with at least {i:2} plays: {len(filtered_df)}")
+    
+    output_file = "MIN_PLAYS.xlsx"
+    result_df.to_excel(output_file)
 
-    # print(filtered_df["master_metadata_track_name"])
+    min_plays_cutoff = result_df[result_df['count'] >= min_plays]
 
-    # print(result_df["master_metadata_track_name"])
+    print(min_plays_cutoff)
+    return min_plays_cutoff
 
-    # for song in filtered_data["master_metadata_track_name"]:
-    #     print(song)
+def get_num_songs_at_least_m_plays(song_list, m):
+    id_counts = song_list['spotify_track_uri'].value_counts()
 
-    # filtered_data = pd.DataFrame(songs)
+    # Create a new DataFrame ordered by id counts
+    sorted_df = pd.DataFrame({'spotify_track_uri': id_counts.index, 'count': id_counts.values})
 
-    # remove_single_occurrences(filtered_data)
+    # Merge with the original DataFrame to include the corresponding names
+    result_df = pd.merge(sorted_df, song_list, on='spotify_track_uri')
+        
+    # This line is great - I love this line
+    # creates a dataframe of all songs with count > i
+    filtered_df = result_df[result_df['count'] >= m]
+
+    num_songs = len(filtered_data)
+
+    print(f"Num songs with at least {m:2} plays: {num_songs}")
+
+    return num_songs
+
+def get_filtered_song_list(filtered_songs, min_plays=2):
+
+    ordered_songs_by_count = get_songs_by_min_plays(filtered_songs, min_plays)
+    # print(ordered_songs_by_count)
+
+    removed_dupes = remove_duplicates(ordered_songs_by_count)
+
+    return removed_dupes
+
+if __name__=="__main__":
+    filtered_data = pd.read_json('filtered_output.json')
+    print("Num songs total: " + str(len(filtered_data)))
+
+    ordered_songs_by_count = get_songs_by_min_plays(filtered_data, 5)
+    # print(ordered_songs_by_count)
+
+    removed_dupes = remove_duplicates(ordered_songs_by_count)
+
+    print(removed_dupes)
 
 
 
