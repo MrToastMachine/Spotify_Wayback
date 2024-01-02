@@ -52,11 +52,14 @@ if __name__ == "__main__":
     #Get JSON data from source file
     json_data = get_json_data()
 
-    # Launch tkinter window to get playlist info
+    # Launch tkinter window to get playlist info. Options:
+    #   - Start and End Date
+    #   - Num plays cutoff
     playlist_specs = tkCalendar.get_playlist_info()
     print(f"playlist_specs : {playlist_specs}")
 
     # excessive but makes it clearer
+    # playlist specs returns tuple (start date, end date, num plays)
     dates = [x for x in playlist_specs[:2]]
     num_song_plays = playlist_specs[2] if playlist_specs[2] else 2
     print(f"dates : {dates}")
@@ -72,6 +75,9 @@ if __name__ == "__main__":
     # Create playlist title for spotify
     playlist_title = get_title_from_dates(dates)
 
+
+    ##### PLAYLIST CURATION #####
+
     # trim data to chosen date range
     filtered_data = filter_data_by_date_range(json_data, start_date, end_date)
     pd_filtered_data = pd.DataFrame(filtered_data)
@@ -80,12 +86,11 @@ if __name__ == "__main__":
     output_file = "filtered_output.json"
     with open(output_file, "w") as file:
         json.dump(filtered_data, file, indent=4)
-
     print(f"Filtered data saved to '{output_file}'.")
 
-    # remove duplicate songs
+    # remove songs with less than 'num_song_plays' plays
     final_playlist = get_filtered_song_list(pd_filtered_data, min_plays=num_song_plays)
-    print("Successfully trimmed...")
+    print(f"Successfully removed songs with less than {num_song_plays} plays...")
 
     final_playlist.to_excel("final_list.xlsx")
 
