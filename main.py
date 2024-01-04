@@ -9,6 +9,18 @@ from pandas_json import *
 from create_playlist import *
 from tk_load_file import *
 
+debug = False
+
+debug_msg_on = " DEBUG MODE ON "
+debug_msg_off = " DEBUG MODE OFF "
+
+if debug:
+    print(f"{debug_msg_on:#^50}")
+else:
+    print(f"{debug_msg_off:#^50}")
+
+
+
 def get_json_data():
     input_file = "Full_Streaming_History.json"  # Change this to the path of your JSON input file
 
@@ -28,8 +40,12 @@ def get_title_from_dates(dates):
     start_date_old = datetime.strptime(dates[0], "%d/%m/%Y")
     start_date = start_date_old.strftime("%d/%m/%y")
     
-    end_date_old = datetime.strptime(dates[0], "%d/%m/%Y")
+    end_date_old = datetime.strptime(dates[1], "%d/%m/%Y")
     end_date = end_date_old.strftime("%d/%m/%y")
+
+    if debug:
+        print(f"Start Date Chosen: {start_date}")
+        print(f"End Date Chosen: {end_date}")
 
     return f"Wayback [{start_date} - {end_date}]"
 
@@ -62,8 +78,9 @@ if __name__ == "__main__":
     # playlist specs returns tuple (start date, end date, num plays)
     dates = [x for x in playlist_specs[:2]]
     num_song_plays = playlist_specs[2] if playlist_specs[2] else 2
-    print(f"dates : {dates}")
-    print(f"num_song_plays : {num_song_plays}")
+
+    if debug:
+        print(f"num_song_plays : {num_song_plays}")
 
 
     # Format dates to usable format
@@ -82,6 +99,9 @@ if __name__ == "__main__":
     filtered_data = filter_data_by_date_range(json_data, start_date, end_date)
     pd_filtered_data = pd.DataFrame(filtered_data)
 
+    if debug:
+        print(f"Total songs in given date range: {len(filtered_data)}")
+
     # write trimmed list to intermediate json file
     output_file = "filtered_output.json"
     with open(output_file, "w") as file:
@@ -92,7 +112,11 @@ if __name__ == "__main__":
     final_playlist = get_filtered_song_list(pd_filtered_data, min_plays=num_song_plays)
     print(f"Successfully removed songs with less than {num_song_plays} plays...")
 
+    if debug:
+        print(f"Num songs to add to playlist: {len(final_playlist)}")
+
     final_playlist.to_excel("final_list.xlsx")
 
-    create_new_playlist(final_playlist, playlist_title)
+    if not debug:
+        create_new_playlist(final_playlist, playlist_title)
 

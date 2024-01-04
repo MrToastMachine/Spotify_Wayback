@@ -23,20 +23,21 @@ def get_songs_by_min_plays(song_list, min_plays):
     # Merge with the original DataFrame to include the corresponding names
     result_df = pd.merge(sorted_df, song_list, on='spotify_track_uri')
 
-    for i in range(15):
+    # this was the original code: it just listed how many songs with
+    # given number of plays. Doesnt account for duplicates AFAIK
+    # for i in range(15):
         
-        # This line is great - I love this line
-        # creates a dataframe of all songs with count > i
-        filtered_df = result_df[result_df['count'] >= i]
+    #     # This line is great - I love this line
+    #     # creates a dataframe of all songs with count > i
+    #     filtered_df = result_df[result_df['count'] >= i]
 
-        print(f"Num songs with at least {i:2} plays: {len(filtered_df)}")
+    #     print(f"Num songs with at least {i:2} plays: {len(filtered_df)}")
     
     output_file = "MIN_PLAYS.xlsx"
     result_df.to_excel(output_file)
 
     min_plays_cutoff = result_df[result_df['count'] >= min_plays]
 
-    print(min_plays_cutoff)
     return min_plays_cutoff
 
 def get_filtered_song_list(filtered_songs, min_plays=2):
