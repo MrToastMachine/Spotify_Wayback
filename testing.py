@@ -1,41 +1,34 @@
-import tkinter as tk
-from tkinter import ttk
+"""
+selection = combo.get()
+messagebox.showinfo(
+    title="New Selection",
+    message=f"Selected option: {selection}"
+)
+
+"""
 import pandas as pd
+from pandas_json import *
 
-# Assuming you have a DataFrame named df
-# Replace this with your actual DataFrame or data source
-data = {'id': [1, 2, 1, 3, 2, 1, 3, 2, 3],
-        'name': ['Alice', 'Bob', 'Charlie', 'David', 'Eva', 'Frank', 'Grace', 'Henry', 'Ivy']}
-df = pd.DataFrame(data)
+input_file = "Full_Streaming_History.json"
+"""
+with open(input_file, "r", encoding="utf8") as file:
+    # json_data = json.load(file)
+    json_data = pd.read_json(input_file)
 
-input_list = "final_list.xlsx"
-df = pd.read_excel(input_list)
+top_ten_artists = get_top_artists(json_data, 10)
+print("Top Artists")
+print(top_ten_artists['master_metadata_album_artist_name'])
 
-def display_dataframe_as_table(dataframe):
-    # Create the main window
-    window = tk.Tk()
-    window.title("DataFrame Table")
+print("Done")
+"""
 
-    # Create Treeview widget
-    tree = ttk.Treeview(window)
-    
-    # Configure Treeview columns
-    tree["columns"] = tuple(dataframe.columns)
 
-    # Add columns to Treeview
-    for col in dataframe.columns:
-        tree.column(col, anchor="center", width=100)
-        tree.heading(col, text=col)
+x = 5
 
-    # Insert data into Treeview
-    for index, row in dataframe.iterrows():
-        tree.insert("", index, values=tuple(row))
+print(x)
+def goop():
+    x = 6
+    print("changed x")
 
-    # Display Treeview
-    tree.pack(expand=True, fill="both")
+print(x)
 
-    # Run the Tkinter event loop
-    window.mainloop()
-
-# Display the DataFrame as a table
-display_dataframe_as_table(df)

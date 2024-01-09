@@ -57,6 +57,7 @@ def create_new_playlist(song_list, playlist_name=None, playlist_desc=None):
             print(f"Error adding track {song_uri_list[i]}")
 
     print("Complete!")
+    return
 
 run = False
 if run:

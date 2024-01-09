@@ -1,10 +1,10 @@
 import json
 import pandas as pd
 
-def remove_duplicates(input_df):
+def remove_duplicates(input_df, key='spotify_track_uri'):
     # Create list of bools representing duplicate songs
     # True for all entries with duplicates
-    duplicates_mask = input_df.duplicated(keep="first", subset=['spotify_track_uri'])
+    duplicates_mask = input_df.duplicated(keep="first", subset=[key])
     # Convert boolean list to excel
     # duplicates_mask.to_excel('duplicates_mask.xlsx')
 
@@ -23,31 +23,37 @@ def get_songs_by_min_plays(song_list, min_plays):
     # Merge with the original DataFrame to include the corresponding names
     result_df = pd.merge(sorted_df, song_list, on='spotify_track_uri')
 
-    # this was the original code: it just listed how many songs with
-    # given number of plays. Doesnt account for duplicates AFAIK
-    # for i in range(15):
-        
-    #     # This line is great - I love this line
-    #     # creates a dataframe of all songs with count > i
-    #     filtered_df = result_df[result_df['count'] >= i]
+    no_duplicates = remove_duplicates(result_df)
 
-    #     print(f"Num songs with at least {i:2} plays: {len(filtered_df)}")
-    
-    output_file = "MIN_PLAYS.xlsx"
-    result_df.to_excel(output_file)
-
-    min_plays_cutoff = result_df[result_df['count'] >= min_plays]
+    min_plays_cutoff = no_duplicates[no_duplicates['count'] >= min_plays]
 
     return min_plays_cutoff
+
+def get_top_artists(song_list, num_top_artists):
+    artist_playcount = song_list['master_metadata_album_artist_name'].value_counts()
+
+    # Create a new DataFrame ordered by id counts
+    sorted_df = pd.DataFrame({'master_metadata_album_artist_name': artist_playcount.index, 'count': artist_playcount.values})
+
+    # Merge with the original DataFrame to include the corresponding names
+    result_df = pd.merge(sorted_df, song_list, on='master_metadata_album_artist_name')
+
+    no_duplicates = remove_duplicates(result_df, key='master_metadata_album_artist_name')
+
+    return no_duplicates[:num_top_artists]
+
 
 def get_filtered_song_list(filtered_songs, min_plays=2):
 
     ordered_songs_by_count = get_songs_by_min_plays(filtered_songs, min_plays)
     # print(ordered_songs_by_count)
 
-    removed_dupes = remove_duplicates(ordered_songs_by_count)
+    # removed_dupes = remove_duplicates(ordered_songs_by_count)
 
-    return removed_dupes
+    output_file = "FINAL_PLAYLIST.xlsx"
+    ordered_songs_by_count.to_excel(output_file)
+
+    return ordered_songs_by_count
 
 if __name__=="__main__":
     filtered_data = pd.read_json('filtered_output.json')
@@ -59,8 +65,3 @@ if __name__=="__main__":
     removed_dupes = remove_duplicates(ordered_songs_by_count)
 
     print(removed_dupes)
-
-
-
-# TODO
-# Include count of each song as new data column in dataframe - figure out how
