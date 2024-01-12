@@ -42,13 +42,13 @@ def get_available_data_range(dataset):
     if earliest_date_ts:
 
         iso_datetime = datetime.strptime(earliest_date_ts.split("T")[0], "%Y-%m-%d")
-        earliest_date = iso_datetime.strftime("%d %B %Y")
+        earliest_date = iso_datetime.strftime("%d %b %Y")
     
         latest_date_ts = dataset.iloc[-1].get("ts")
         if latest_date_ts:
 
             iso_datetime = datetime.strptime(latest_date_ts.split("T")[0], "%Y-%m-%d")
-            latest_date = iso_datetime.strftime("%d %B %Y")
+            latest_date = iso_datetime.strftime("%d %b %Y")
             return (earliest_date, latest_date)
 
 
@@ -110,17 +110,25 @@ def prompt_for_dates():
     date_app = tk.Tk()
     date_app.title("Date Picker")
 
+    CURRENT_ROW = 0
+
+    song_count_label = tk.Label(date_app, text=f"Date Range Available: {earliest_date} to {latest_date}")
+    song_count_label.grid(row=CURRENT_ROW, columnspan=3, padx=10, pady=5)
+
+    CURRENT_ROW += 1
+
     cal_start = Calendar(date_app, selectmode="day")
-    cal_start.grid(row=0, column=0, padx=10, pady=5)
+    cal_start.grid(row=CURRENT_ROW, column=0, padx=10, pady=5)
 
     cal_end = Calendar(date_app, selectmode="day")
-    cal_end.grid(row=0, column=1, padx=10, pady=5)
+    cal_end.grid(row=CURRENT_ROW, column=1, padx=10, pady=5)
 
+    CURRENT_ROW += 1
 
     # select_button = tk.Button(date_app, text="Select Dates", command=return )
     select_button = tk.Button(date_app, text="Confirm", command=on_date_select)
     # select_button.grid(row=1, columnspan=2, padx=10, pady=5)
-    select_button.grid(row=1, columnspan=2, padx=10, pady=5)
+    select_button.grid(row=CURRENT_ROW, columnspan=2, padx=10, pady=5)
 
     date_app.mainloop()
 
