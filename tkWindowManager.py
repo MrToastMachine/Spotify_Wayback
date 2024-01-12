@@ -8,7 +8,7 @@ from create_playlist import *
 from main import *
 import time
 
-json_data = []
+debug = True
 
 def get_title_from_dates(dates):
     start_date_old = datetime.strptime(dates[0], "%d/%m/%Y")
@@ -36,6 +36,21 @@ def filter_data_by_date_range(data, start_date, end_date):
                 filtered_data.append(item)
 
     return filtered_data
+
+def get_available_data_range(dataset):
+    earliest_date_ts = dataset.iloc[0].get("ts")
+    if earliest_date_ts:
+
+        iso_datetime = datetime.strptime(earliest_date_ts.split("T")[0], "%Y-%m-%d")
+        earliest_date = iso_datetime.strftime("%d %B %Y")
+    
+        latest_date_ts = dataset.iloc[-1].get("ts")
+        if latest_date_ts:
+
+            iso_datetime = datetime.strptime(latest_date_ts.split("T")[0], "%Y-%m-%d")
+            latest_date = iso_datetime.strftime("%d %B %Y")
+            return (earliest_date, latest_date)
+
 
 def get_json_data():
     input_file = "Full_Streaming_History.json"  # Change this to the path of your JSON input file
@@ -82,11 +97,14 @@ def prompt_for_dates():
 
         date_app.destroy()
 
-
+        print(pd_filtered_data)
         playlist_curation(pd_filtered_data, playlist_title)
     
     #Get JSON data from source file
     json_data = get_json_data()    
+
+    earliest_date, latest_date = get_available_data_range(pd.DataFrame(json_data))
+    print(earliest_date, latest_date)
 
     #APP STRUCTURE SETUP - DATE PICKER
     date_app = tk.Tk()
@@ -98,22 +116,16 @@ def prompt_for_dates():
     cal_end = Calendar(date_app, selectmode="day")
     cal_end.grid(row=0, column=1, padx=10, pady=5)
 
-    # Number input box
-    num_label = tk.Label(date_app, text="Other Options")
-    num_label.grid(row=1, columnspan=2, padx=10, pady=5)
 
     # select_button = tk.Button(date_app, text="Select Dates", command=return )
     select_button = tk.Button(date_app, text="Confirm", command=on_date_select)
     # select_button.grid(row=1, columnspan=2, padx=10, pady=5)
-    select_button.grid(row=3, columnspan=2)
+    select_button.grid(row=1, columnspan=2, padx=10, pady=5)
 
-    print("Before mainloop")
     date_app.mainloop()
-    print("After mainloop")
 
 
 def playlist_curation(song_list, playlist_title):
-    # songs_with_min_plays = []
     num_songs_in_list = 0
 
     def getCount():
@@ -165,7 +177,7 @@ def playlist_curation(song_list, playlist_title):
     #APP STRUCTURE SETUP - PLAYLIST INFO
     app = tk.Tk()
     app.title("Playlist information")
-    app.geometry("500x600")
+    # app.geometry("500x600")
 
     # Number input box
     num_label = tk.Label(app, text="Num Plays")
@@ -199,7 +211,7 @@ def playlist_curation(song_list, playlist_title):
 
     app.mainloop()
 
-
+# Jumps straight to playlist modification window
 def playlist_info_debugging():
     song_list = pd.read_json('filtered_output.json')
 
@@ -207,6 +219,5 @@ def playlist_info_debugging():
 
 if __name__ == "__main__":
 
-    # prompt_for_dates()
+    prompt_for_dates()
 
-    playlist_info_debugging()

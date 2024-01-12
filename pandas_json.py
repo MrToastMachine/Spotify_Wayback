@@ -1,20 +1,20 @@
 import json
 import pandas as pd
 
+intermediate_files = False
+
 def remove_duplicates(input_df, key='spotify_track_uri'):
     # Create list of bools representing duplicate songs
     # True for all entries with duplicates
     duplicates_mask = input_df.duplicated(keep="first", subset=[key])
-    # Convert boolean list to excel
-    # duplicates_mask.to_excel('duplicates_mask.xlsx')
 
     # Trim list of duplicate entries
     all_duplicates_removed = input_df[duplicates_mask==False]
-    # all_duplicates.to_excel('all_duplicates.xlsx')
 
     return all_duplicates_removed
 
 def get_songs_by_min_plays(song_list, min_plays):
+    print(song_list)
     id_counts = song_list['spotify_track_uri'].value_counts()
 
     # Create a new DataFrame ordered by id counts
@@ -50,8 +50,9 @@ def get_filtered_song_list(filtered_songs, min_plays=2):
 
     # removed_dupes = remove_duplicates(ordered_songs_by_count)
 
-    output_file = "FINAL_PLAYLIST.xlsx"
-    ordered_songs_by_count.to_excel(output_file)
+    if intermediate_files:
+        output_file = "FINAL_PLAYLIST.xlsx"
+        ordered_songs_by_count.to_excel(output_file)
 
     return ordered_songs_by_count
 
