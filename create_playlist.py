@@ -19,8 +19,6 @@ current_date = datetime.now()
 # Format the date as DD-MM-YYYY
 formatted_date = current_date.strftime("%d-%m-%Y")
 
-# print(f"Current Date: {formatted_date}")
-
 scope = "playlist-modify-public"
 
 credentials_manager = SpotifyOAuth(scope=scope, client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URI, open_browser=False)

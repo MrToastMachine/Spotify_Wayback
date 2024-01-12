@@ -1,7 +1,7 @@
 import json
 import pandas as pd
 
-intermediate_files = False
+intermediate_files = True
 
 def remove_duplicates(input_df, key='spotify_track_uri'):
     # Create list of bools representing duplicate songs
@@ -14,7 +14,7 @@ def remove_duplicates(input_df, key='spotify_track_uri'):
     return all_duplicates_removed
 
 def get_songs_by_min_plays(song_list, min_plays):
-    print(song_list)
+    # print(song_list)
     id_counts = song_list['spotify_track_uri'].value_counts()
 
     # Create a new DataFrame ordered by id counts
@@ -28,6 +28,21 @@ def get_songs_by_min_plays(song_list, min_plays):
     min_plays_cutoff = no_duplicates[no_duplicates['count'] >= min_plays]
 
     return min_plays_cutoff
+
+def get_top_x_songs(song_list, num_songs):
+    id_counts = song_list['spotify_track_uri'].value_counts()
+
+    # Create a new DataFrame ordered by id counts
+    sorted_df = pd.DataFrame({'spotify_track_uri': id_counts.index, 'count': id_counts.values})
+
+    # Merge with the original DataFrame to include the corresponding names
+    result_df = pd.merge(sorted_df, song_list, on='spotify_track_uri')
+
+    no_duplicates = remove_duplicates(result_df)
+
+    top_x_songs = no_duplicates.head(num_songs)
+
+    return top_x_songs
 
 def get_top_artists(song_list, num_top_artists):
     artist_playcount = song_list['master_metadata_album_artist_name'].value_counts()
@@ -45,8 +60,10 @@ def get_top_artists(song_list, num_top_artists):
 
 def get_filtered_song_list(filtered_songs, min_plays=2):
 
-    ordered_songs_by_count = get_songs_by_min_plays(filtered_songs, min_plays)
-    # print(ordered_songs_by_count)
+    # ordered_songs_by_count = get_songs_by_min_plays(filtered_songs, min_plays)
+
+    
+    ordered_songs_by_count = get_top_x_songs(filtered_songs, min_plays)
 
     # removed_dupes = remove_duplicates(ordered_songs_by_count)
 
