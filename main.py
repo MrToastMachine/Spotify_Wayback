@@ -98,14 +98,12 @@ def prompt_for_dates():
 
         date_app.destroy()
 
-        print(pd_filtered_data)
         playlist_curation(pd_filtered_data, playlist_title)
     
     #Get JSON data from source file
     json_data = get_json_data()    
 
     earliest_date, latest_date = get_available_data_range(pd.DataFrame(json_data))
-    print(earliest_date, latest_date)
 
     #APP STRUCTURE SETUP - DATE PICKER
     date_app = tk.Tk()
@@ -135,34 +133,22 @@ def prompt_for_dates():
 
 
 def playlist_curation(song_list, playlist_title):
-    num_songs_in_list = 0
 
     def getCount():
-        global num_songs_selected
-        global num_songs_in_list
 
-        try:
-            min_plays = int(num_entry.get())
-        except:
-            tk.messagebox.showinfo(
-                title="Not a number bud",
-                message=f"Please input a positive number"
-            )
+        top_5_song_names = get_top_x_songs(song_list, 5, names_only=True)
 
-        print(f"Number chosen: {min_plays}")
+        song_listbox.delete(0,END)
+        # Insert each song into the listbox
+        for i, song in enumerate(top_5_song_names):
+            song_listbox.insert(tk.END, f"{i+1:2}.\t" + song)
 
-        num_songs_selected = get_filtered_song_list(song_list, min_plays)
-        print(num_songs_selected)
+        top_5_artist_names = get_top_artists(song_list, 5)
 
-        num_songs_in_list = len(num_songs_selected)
-
-        song_count_label.config(text=f"Number of songs in list: {num_songs_in_list}")
-
-        print(f"Number of songs in playlist: {num_songs_in_list}")
-        top_artists = get_top_artists(num_songs_selected, 5)
-
-        print("Top Artists:")
-        print(top_artists)
+        artist_listbox.delete(0,END)
+        # Insert each song into the listbox
+        for i, artist in enumerate(top_5_artist_names):
+            artist_listbox.insert(tk.END, f"{i+1:2}.\t" + artist)
 
     def returnToDateSelection():
         app.destroy()
@@ -170,14 +156,27 @@ def playlist_curation(song_list, playlist_title):
         prompt_for_dates()
 
     def createSpotifyPlaylist():
-        if not isinstance(num_songs_selected, pd.DataFrame):
+        try:
+            num_songs = int(num_entry.get())
+        except:
+            tk.messagebox.showinfo(
+                title="Not a number bud",
+                message=f"Please input a positive number"
+            )
+
+        final_song_list = get_filtered_song_list(song_list, num_songs)
+
+        if not isinstance(final_song_list, pd.DataFrame):
             print("No songs selected!")
-            print(num_songs_selected)
+            print(type(final_song_list))
             return
         
     
-        create_new_playlist(num_songs_selected, playlist_title)
+        create_new_playlist(final_song_list, playlist_title)
         app.quit()
+    
+    def showAllSongs():
+        pass
 
 
     row_num = 0
@@ -187,35 +186,61 @@ def playlist_curation(song_list, playlist_title):
     #APP STRUCTURE SETUP - PLAYLIST INFO
     app = tk.Tk()
     app.title("Playlist information")
-    # app.geometry("500x600")
+    app.geometry("625x350")
 
     # Number input box
-    num_label = tk.Label(app, text="Num Plays")
-    num_label.grid(row=row_num, column=0, padx=10, pady=5)
+    num_label = tk.Label(app, text="Number of Top Songs")
+    num_label.grid(row=row_num, column=0, padx=5, pady=5)
 
     num_entry = tk.Entry(app)
-    num_entry.grid(row=row_num, column=1, padx=10, pady=5)
-
-    # ------------ NEW ROW ----------------
-    row_num += 1
-
-    song_count_label = tk.Label(app, text=f"Number of songs in list: {num_songs_in_list}")
-    song_count_label.grid(row=row_num, columnspan=3, padx=10, pady=5)
-
-    # ------------ NEW ROW ----------------
-    row_num += 1
+    num_entry.grid(row=row_num, column=2, padx=5, pady=5)
 
     select_button = tk.Button(app, text="Confirm", command=getCount)
-    select_button.grid(row=row_num, columnspan=3, padx=10, pady=5)
+    select_button.grid(row=row_num, column=3, padx=5, pady=5)
+
+    # ------------ NEW ROW ----------------
+    row_num += 1
+
+    # Create a label for the heading
+    top_songs_label = tk.Label(app, text="Top Songs", font=("Helvetica", 14, "bold"))
+    top_songs_label.grid(row=row_num, column=0, columnspan=2, padx=20, pady=5)
+
+    # Create a label for the heading
+    top_artists_label = tk.Label(app, text="Top Artists", font=("Helvetica", 14, "bold"))
+    top_artists_label.grid(row=row_num, column=2, columnspan=2, pady=5)
+
+    # ------------ NEW ROW ----------------
+    row_num += 1
+
+    # Create a listbox to display the songs
+    song_listbox = tk.Listbox(app, selectmode=tk.SINGLE, font=("Helvetica", 14))
+
+    # Configure the Listbox widget to set the width to its content
+    song_listbox.configure(background="black", foreground="white", font=('Aerial 13'), width=26, height=10)
+    song_listbox.grid(row=row_num, column=0, columnspan=2, padx=40, pady=5)
+
+    # Create a listbox to display the artists
+    artist_listbox = tk.Listbox(app, selectmode=tk.SINGLE, font=("Helvetica", 14))
+
+    # Configure the Listbox widget to set the width to its content
+    artist_listbox.configure(background="black", foreground="white", font=('Aerial 13'), width=26, height=10)
+    artist_listbox.grid(row=row_num, column=2, columnspan=2, padx=20, pady=10)
+
+    # ------------ NEW ROW ----------------
+    row_num += 1
+
+    select_button = tk.Button(app, text="Create Playlist", command=createSpotifyPlaylist)
+    select_button.grid(row=row_num, columnspan=4, padx=0, pady=5)
 
     # ------------ NEW ROW ----------------
     row_num += 1
 
     select_button = tk.Button(app, text="Date Selection", command=returnToDateSelection)
-    select_button.grid(row=row_num, column=0, padx=10, pady=5)
+    select_button.grid(row=row_num, column=0, columnspan=2, padx=0, pady=5)
 
-    select_button = tk.Button(app, text="Create Playlist", command=createSpotifyPlaylist)
-    select_button.grid(row=row_num, column=2, padx=10, pady=5)
+
+    show_all_songs_button = tk.Button(app, text="Show all songs", command=showAllSongs)
+    show_all_songs_button.grid(row=row_num, column=2, columnspan=2, padx=0, pady=5)
 
 
 
@@ -230,4 +255,6 @@ def playlist_info_debugging():
 if __name__ == "__main__":
 
     prompt_for_dates()
+
+    # playlist_info_debugging()
 

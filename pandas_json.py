@@ -29,7 +29,7 @@ def get_songs_by_min_plays(song_list, min_plays):
 
     return min_plays_cutoff
 
-def get_top_x_songs(song_list, num_songs):
+def get_top_x_songs(song_list, num_songs, names_only=False):
     id_counts = song_list['spotify_track_uri'].value_counts()
 
     # Create a new DataFrame ordered by id counts
@@ -39,33 +39,32 @@ def get_top_x_songs(song_list, num_songs):
     result_df = pd.merge(sorted_df, song_list, on='spotify_track_uri')
 
     no_duplicates = remove_duplicates(result_df)
-
-    top_x_songs = no_duplicates.head(num_songs)
-
+    print(no_duplicates)
+    
+    if names_only:
+        top_x_songs = no_duplicates["master_metadata_track_name"].head(num_songs)
+    else:
+        top_x_songs = no_duplicates.head(num_songs)
+        
     return top_x_songs
 
 def get_top_artists(song_list, num_top_artists):
     artist_playcount = song_list['master_metadata_album_artist_name'].value_counts()
 
     # Create a new DataFrame ordered by id counts
-    sorted_df = pd.DataFrame({'master_metadata_album_artist_name': artist_playcount.index, 'count': artist_playcount.values})
+    sorted_df = pd.DataFrame({'master_metadata_album_artist_name': artist_playcount.index, 'artist_count': artist_playcount.values})
 
     # Merge with the original DataFrame to include the corresponding names
     result_df = pd.merge(sorted_df, song_list, on='master_metadata_album_artist_name')
 
     no_duplicates = remove_duplicates(result_df, key='master_metadata_album_artist_name')
 
-    return no_duplicates[:num_top_artists]
+    return no_duplicates["master_metadata_album_artist_name"].head(num_top_artists)
 
 
-def get_filtered_song_list(filtered_songs, min_plays=2):
+def get_filtered_song_list(filtered_songs, num_songs):
 
-    # ordered_songs_by_count = get_songs_by_min_plays(filtered_songs, min_plays)
-
-    
-    ordered_songs_by_count = get_top_x_songs(filtered_songs, min_plays)
-
-    # removed_dupes = remove_duplicates(ordered_songs_by_count)
+    ordered_songs_by_count = get_top_x_songs(filtered_songs, num_songs)
 
     if intermediate_files:
         output_file = "FINAL_PLAYLIST.xlsx"
