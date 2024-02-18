@@ -72,18 +72,16 @@ def prompt_for_dates():
 
     def us_to_uk_date(us_date):
         parts = us_date.split('/')
-        uk_date = f"{parts[1]}/{parts[0]}/20{parts[2]}"
+        uk_date = f"{parts[1]}/{parts[0]}/{parts[2]}"
         return uk_date
 
     def on_date_select():
-        # Doing this isnt great - should find better way
-        # global start_date
-        # global end_date
 
-        start_date_us = cal_start.get_date()
-        end_date_us = cal_end.get_date()
-        start_date_str = us_to_uk_date(start_date_us)
-        end_date_str = us_to_uk_date(end_date_us)
+        start_date_str = cal_start.get_date()
+        end_date_str = cal_end.get_date()
+
+        # start_date_str = us_to_uk_date(start_date_us)
+        # end_date_str = us_to_uk_date(end_date_us)
 
         start_date = datetime.strptime(start_date_str + " 00:00:01", "%d/%m/%Y %H:%M:%S")
         end_date = datetime.strptime(end_date_str + " 23:59:59", "%d/%m/%Y %H:%M:%S")
